@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+	<title>canvas之理解isPointInPath</title>
+	<style>
+		html,body{
+			margin: 0;
+			padding: 0;
+		}
+		#buttons a + a{
+			margin-left: 8px;
+		}
+	</style>
+</head>
+<body>
+	<div style="text-align: center; margin: 30px auto; min-width: 1300px;">
+		<div style="text-align: center;">
+			<div style="display: inline-block;text-align: center; width: 600px">鼠标点击</div>
+			<div style="display: inline-block;text-align: center; width: 600px">鼠标划上</div>
+		</div>
+		<canvas id="canvas1" style="border: 1px solid #eee; display: inline-block;">canvas</canvas>
+		<canvas id="canvas2" style="border: 1px solid #eee; display: inline-block;">canvas</canvas>
+	</div>
+	<script>
+		var clickballs = [];//点击变颜色的小球
+		var mousemoveballs = [];//划上变颜色的小球
+		var windowW = 600;
+		var windowH = 600;//canvas高
+		var canvas1 = document.getElementById('canvas1');
+		var canvas2 = document.getElementById('canvas2');
+		canvas1.width = windowW;
+		canvas1.height = windowH;
+		canvas2.width = windowW;
+		canvas2.height = windowH;
+		var context1 = canvas1.getContext('2d');
+		var context2 = canvas2.getContext('2d');
+		window.onload = function(){
+			createClickBall1();
+			createClickBall2();
+			drawClickBall();
+			drawMousemoveBall();
+			canvas1.addEventListener('click', clickDetection);
+			canvas2.addEventListener('mousemove', mousemoveDetection);
+		}
+
+		function mousemoveDetection(e){
+			var x = e.clientX - context2.canvas.getBoundingClientRect().left;
+			var y = e.clientY - context2.canvas.getBoundingClientRect().top;
+			for(var i = 0; i < mousemoveballs.length; i++){
+				context2.beginPath();
+				context2.arc(mousemoveballs[i].x, mousemoveballs[i].y, mousemoveballs[i].r, 0, 2*Math.PI);
+				if(context2.isPointInPath(x, y)){
+					mousemoveballs[i].color = 'red';
+				}else{
+					mousemoveballs[i].color = '#035';
+				}
+				drawMousemoveBall();
+			}
+
+		}
+
+		function clickDetection(e){
+			var x = e.clientX - context1.canvas.getBoundingClientRect().left;
+			var y = e.clientY - context1.canvas.getBoundingClientRect().top;
+			for(var i = 0; i < clickballs.length; i++){
+				context1.beginPath();
+				context1.arc(clickballs[i].x, clickballs[i].y, clickballs[i].r, 0, 2*Math.PI);
+				if(context1.isPointInPath(x, y)){
+					clickballs[i].color = 'red';
+					drawClickBall(context1);
+				}
+			}
+
+		}
+
+		function drawClickBall(){
+			context1.clearRect(0, 0, context1.canvas.width, context1.canvas.height);
+			for(var i = 0; i < clickballs.length; i++){
+				context1.beginPath();
+				context1.arc(clickballs[i].x, clickballs[i].y, clickballs[i].r, 0, 2*Math.PI);
+				context1.fillStyle = clickballs[i].color || '#035';
+				context1.fill();
+			}
+		}
+
+		function drawMousemoveBall(){
+			context2.clearRect(0, 0, context2.canvas.width, context2.canvas.height);
+			for(var i = 0; i < mousemoveballs.length; i++){
+				context2.beginPath();
+				context2.arc(mousemoveballs[i].x, mousemoveballs[i].y, mousemoveballs[i].r, 0, 2*Math.PI);
+				context2.fillStyle = mousemoveballs[i].color || '#035';
+				context2.fill();
+			}
+		}
+
+		function createClickBall1(){
+			for(var i = 0; i < 10; i++){
+				var x = Math.random()*windowW;
+				var y = Math.random()*windowH;
+				var r = Math.random()*40 + 20;
+				var color = '#035';
+				clickballs.push({ x, y, r, color });
+			}
+		}
+
+		function createClickBall2(){
+			for(var i = 0; i < 10; i++){
+				var x = Math.random()*windowW;
+				var y = Math.random()*windowH;
+				var r = Math.random()*40 + 20;
+				var color = '#035';
+				mousemoveballs.push({ x, y, r, color });
+			}
+		}
+	</script>
+</body>
+</html>
